@@ -1,27 +1,25 @@
-import * as vscode from 'vscode';
+import * as vscode from 'coc.nvim';
+import Uri from 'vscode-uri';
 import { Server } from '../server';
+import { Event, EventEmitter } from '../vscode_events';
 
-const statusUri = vscode.Uri.parse('rust-analyzer-status://status');
+const statusUri = Uri.parse('rust-analyzer-status://status');
 
 export class TextDocumentContentProvider
     implements vscode.TextDocumentContentProvider {
-    public eventEmitter = new vscode.EventEmitter<vscode.Uri>();
+    public eventEmitter = new EventEmitter<Uri>();
     public syntaxTree: string = 'Not available';
 
     public provideTextDocumentContent(
-        uri: vscode.Uri
+        uri: Uri
     ): vscode.ProviderResult<string> {
-        const editor = vscode.window.activeTextEditor;
-        if (editor == null) {
-            return '';
-        }
         return Server.client.sendRequest<string>(
             'rust-analyzer/analyzerStatus',
             null
         );
     }
 
-    get onDidChange(): vscode.Event<vscode.Uri> {
+    get onDidChange(): Event<Uri> {
         return this.eventEmitter.event;
     }
 }
@@ -54,11 +52,9 @@ export function makeCommand(context: vscode.ExtensionContext) {
                 1000
             );
         }
-        const document = await vscode.workspace.openTextDocument(statusUri);
-        return vscode.window.showTextDocument(
+        const document = await vscode.workspace.readFile(statusUri.fsPath);
+        return vscode.workspace.openResource(
             document,
-            vscode.ViewColumn.Two,
-            true
         );
     };
 }
