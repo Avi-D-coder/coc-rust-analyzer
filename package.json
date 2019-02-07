@@ -1,0 +1,237 @@
+{
+    "name": "ra-lsp",
+    "displayName": "ra-lsp",
+    "description": "An alternative rust language server to the RLS",
+    "preview": true,
+    "private": true,
+    "version": "0.0.1",
+    "publisher": "matklad",
+    "repository": {
+        "url": "https://github.com/matklad/rust-analyzer/"
+    },
+    "categories": [
+        "Other"
+    ],
+    "engines": {
+        "coc": ">=0.0.28"
+    },
+    "scripts": {
+        "compile": "tsc -p ./",
+        "watch": "tsc -watch -p ./",
+        "fix": "prettier **/*.{json,ts} --write && tslint --project . --fix",
+        "lint": "tslint --project .",
+        "prettier": "prettier **/*.{json,ts}",
+        "travis": "npm run compile && npm run lint && npm run prettier -- --list-different"
+    },
+    "prettier": {
+        "tabWidth": 4,
+        "singleQuote": true
+    },
+    "dependencies": {
+        "vscode-languageclient": "^5.2.1"
+    },
+    "devDependencies": {
+        "@types/mocha": "^2.2.42",
+        "@types/node": "^8.10.39",
+        "prettier": "^1.15.3",
+        "tslint": "^5.12.1",
+        "tslint-config-prettier": "^1.17.0",
+        "typescript": "^2.6.1",
+        "coc.nvim": "^0.0.32"
+    },
+    "activationEvents": [
+        "onLanguage:rust",
+        "onCommand:rust-analyzer.analyzerStatus",
+        "onCommand:rust-analyzer.collectGarbage"
+    ],
+    "contributes": {
+        "taskDefinitions": [
+            {
+                "type": "cargo",
+                "required": [
+                    "command"
+                ],
+                "properties": {
+                    "label": {
+                        "type": "string"
+                    },
+                    "command": {
+                        "type": "string"
+                    },
+                    "args": {
+                        "type": "array"
+                    },
+                    "env": {
+                        "type": "object"
+                    }
+                }
+            }
+        ],
+        "commands": [
+            {
+                "command": "rust-analyzer.syntaxTree",
+                "title": "Show syntax tree for current file",
+                "category": "Rust Analyzer"
+            },
+            {
+                "command": "rust-analyzer.extendSelection",
+                "title": "Extend selection",
+                "category": "Rust Analyzer"
+            },
+            {
+                "command": "rust-analyzer.matchingBrace",
+                "title": "Find matching brace",
+                "category": "Rust Analyzer"
+            },
+            {
+                "command": "rust-analyzer.parentModule",
+                "title": "Locate parent module",
+                "category": "Rust Analyzer"
+            },
+            {
+                "command": "rust-analyzer.joinLines",
+                "title": "Join lines",
+                "category": "Rust Analyzer"
+            },
+            {
+                "command": "rust-analyzer.run",
+                "title": "Run",
+                "category": "Rust Analyzer"
+            },
+            {
+                "command": "rust-analyzer.analyzerStatus",
+                "title": "Status",
+                "category": "Rust Analyzer"
+            },
+            {
+                "command": "rust-analyzer.collectGarbage",
+                "title": "Run garbage collection",
+                "category": "Rust Analyzer"
+            }
+        ],
+        "keybindings": [
+            {
+                "command": "rust-analyzer.parentModule",
+                "key": "ctrl+u",
+                "when": "editorTextFocus && editorLangId == rust"
+            },
+            {
+                "command": "rust-analyzer.matchingBrace",
+                "key": "ctrl+shift+m",
+                "when": "editorTextFocus && editorLangId == rust"
+            },
+            {
+                "command": "rust-analyzer.extendSelection",
+                "key": "shift+alt+right",
+                "when": "editorTextFocus && editorLangId == rust"
+            },
+            {
+                "command": "rust-analyzer.joinLines",
+                "key": "ctrl+shift+j",
+                "when": "editorTextFocus && editorLangId == rust"
+            },
+            {
+                "command": "rust-analyzer.run",
+                "key": "ctrl+r",
+                "when": "editorTextFocus && editorLangId == rust"
+            }
+        ],
+        "configuration": {
+            "type": "object",
+            "title": "Rust Analyzer",
+            "properties": {
+                "rust-analyzer.highlightingOn": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Highlight Rust code (overrides built-in syntax highlighting)"
+                },
+                "rust-analyzer.raLspServerPath": {
+                    "type": [
+                        "string"
+                    ],
+                    "default": "ra_lsp_server",
+                    "description": "Path to ra_lsp_server executable"
+                },
+                "rust-analyzer.trace.server": {
+                    "type": "string",
+                    "scope": "window",
+                    "enum": [
+                        "off",
+                        "messages",
+                        "verbose"
+                    ],
+                    "default": "off",
+                    "description": "Trace requests to the ra_lsp_server"
+                }
+            }
+        },
+        "problemPatterns": [
+            {
+                "//comment": "named multiline problem patterns are not parsed properly in vscode at the moment, when fixed in vscode replace both \"pattern\": [...] below with \"pattern\": \"$rustc\"",
+                "name": "rustc",
+                "patterns": [
+                    {
+                        "regexp": "^(warning|warn|error)(?:\\[(.*?)\\])?: (.*)$",
+                        "severity": 1,
+                        "code": 2,
+                        "message": 3
+                    },
+                    {
+                        "regexp": "^[\\s->=]*(.*?):(\\d*):(\\d*)\\s*$",
+                        "file": 1,
+                        "line": 2,
+                        "column": 3
+                    }
+                ]
+            }
+        ],
+        "problemMatchers": [
+            {
+                "name": "rustc",
+                "fileLocation": [
+                    "relative",
+                    "${workspaceRoot}"
+                ],
+                "pattern": [
+                    {
+                        "regexp": "^(warning|warn|error)(?:\\[(.*?)\\])?: (.*)$",
+                        "severity": 1,
+                        "code": 2,
+                        "message": 3
+                    },
+                    {
+                        "regexp": "^[\\s->=]*(.*?):(\\d*):(\\d*)\\s*$",
+                        "file": 1,
+                        "line": 2,
+                        "column": 3
+                    }
+                ]
+            },
+            {
+                "name": "rustc-watch",
+                "fileLocation": [
+                    "relative",
+                    "${workspaceRoot}"
+                ],
+                "background": {
+                    "beginsPattern": "^\\[Running ",
+                    "endsPattern": "^(\\[Finished running\\]|To learn more, run the command again with --verbose\\.)$"
+                },
+                "pattern": [
+                    {
+                        "regexp": "^(warning|warn|error)(?:\\[(.*?)\\])?: (.*)$",
+                        "severity": 1,
+                        "code": 2,
+                        "message": 3
+                    },
+                    {
+                        "regexp": "^[\\s->=]*(.*?):(\\d*):(\\d*)\\s*$",
+                        "file": 1,
+                        "line": 2,
+                        "column": 3
+                    }
+                ]
+            }
+        ]
+    }
+}
