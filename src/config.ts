@@ -1,4 +1,4 @@
-import * as vscode from 'vscode';
+import * as vscode from 'coc.nvim';
 
 import { Server } from './server';
 
@@ -22,7 +22,7 @@ export class Config {
         }
 
         if (!this.highlightingOn && Server) {
-            Server.highlighter.removeHighlights();
+            // Server.highlighter.removeHighlights();
         }
 
         if (config.has('raLspServerPath')) {

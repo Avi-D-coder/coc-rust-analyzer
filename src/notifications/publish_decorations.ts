@@ -1,19 +1,19 @@
-import * as vscode from 'vscode';
+// import * as vscode from 'coc.nvim';
 
-import { Decoration } from '../highlighting';
-import { Server } from '../server';
+// // import { Decoration } from '../highlighting';
+// import { Server } from '../server';
 
-export interface PublishDecorationsParams {
-    uri: string;
-    decorations: Decoration[];
-}
+// export interface PublishDecorationsParams {
+//     uri: string;
+//     decorations: Decoration[];
+// }
 
-export function handle(params: PublishDecorationsParams) {
-    const targetEditor = vscode.window.visibleTextEditors.find(
-        editor => editor.document.uri.toString() === params.uri
-    );
-    if (!Server.config.highlightingOn || !targetEditor) {
-        return;
-    }
-    Server.highlighter.setHighlights(targetEditor, params.decorations);
-}
+// export function handle(params: PublishDecorationsParams) {
+//     const targetEditor = vscode.window.visibleTextEditors.find(
+//         editor => editor.document.uri.toString() === params.uri
+//     );
+//     if (!Server.config.highlightingOn || !targetEditor) {
+//         return;
+//     }
+//     Server.highlighter.setHighlights(targetEditor, params.decorations);
+// }

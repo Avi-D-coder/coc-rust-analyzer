@@ -28,7 +28,8 @@
         "singleQuote": true
     },
     "dependencies": {
-        "vscode-languageclient": "^5.2.1"
+        "vscode-languageclient": "^5.2.1",
+        "vscode-uri": "^1.0.6"
     },
     "devDependencies": {
         "@types/mocha": "^2.2.42",

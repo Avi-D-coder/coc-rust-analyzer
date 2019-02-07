@@ -1,10 +1,10 @@
 import * as lc from 'vscode-languageclient';
 
 import { Config } from './config';
-import { Highlighter } from './highlighting';
+// import { Highlighter } from './highlighting';
 
 export class Server {
-    public static highlighter = new Highlighter();
+    // public static highlighter = new Highlighter();
     public static config = new Config();
     public static client: lc.LanguageClient;
 
