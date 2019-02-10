@@ -4,7 +4,7 @@ import * as lc from 'vscode-languageserver-protocol';
 import * as commands from './commands';
 // import { TextDocumentContentProvider } from './commands/syntaxTree';
 // import * as events from './events';
-import * as notifications from './notifications';
+// import * as notifications from './notifications';
 import { Server } from './server';
 
 export async function activate(context: vscode.ExtensionContext) {
@@ -83,10 +83,10 @@ export async function activate(context: vscode.ExtensionContext) {
   const allNotifications: Iterable<
     [string, lc.GenericNotificationHandler]
     > = [
-      [
-        'rust-analyzer/publishDecorations',
-        notifications.publishDecorations.handle
-      ]
+      // [
+      //   'rust-analyzer/publishDecorations',
+      //   notifications.publishDecorations.handle
+      // ]
     ];
 
   // TODO semantic highlighting
