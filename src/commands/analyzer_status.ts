@@ -1,14 +1,14 @@
 import * as vscode from 'coc.nvim';
+import {Emitter, Event} from 'vscode-languageserver-protocol';
 import Uri from 'vscode-uri';
 import { Server } from '../server';
-import { Event, EventEmitter } from '../vscode_events';
 
 const statusUri = Uri.parse('rust-analyzer-status://status');
 
 export class TextDocumentContentProvider
     implements vscode.TextDocumentContentProvider {
-    public eventEmitter = new EventEmitter<Uri>();
     public syntaxTree: string = 'Not available';
+    public eventEmitter = new Emitter<Uri>();
 
     public provideTextDocumentContent(
         uri: Uri
