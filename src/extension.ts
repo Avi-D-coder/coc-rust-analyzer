@@ -1,9 +1,9 @@
 import * as vscode from 'coc.nvim';
-import * as lc from 'vscode-languageclient';
+import * as lc from 'vscode-languageserver-protocol';
 
 import * as commands from './commands';
-import { TextDocumentContentProvider } from './commands/syntaxTree';
-import * as events from './events';
+// import { TextDocumentContentProvider } from './commands/syntaxTree';
+// import * as events from './events';
 import * as notifications from './notifications';
 import { Server } from './server';
 
@@ -17,7 +17,7 @@ export async function activate(context: vscode.ExtensionContext) {
   vscode.commands.registerCommand('rust-analyzer.collectGarbage', () =>
     Server.client.sendRequest<null>('rust-analyzer/collectGarbage', null)
   );
-  vscode.commands.registerCommand('rust-analyzer.syntaxTree', commands.syntaxTree.handle);
+  // vscode.commands.registerCommand('rust-analyzer.syntaxTree', commands.syntaxTree.handle);
   vscode.commands.registerCommand(
     'rust-analyzer.extendSelection',
     commands.extendSelection.handle
@@ -28,9 +28,9 @@ export async function activate(context: vscode.ExtensionContext) {
   );
   vscode.commands.registerCommand('rust-analyzer.joinLines', commands.joinLines.handle);
   vscode.commands.registerCommand('rust-analyzer.parentModule', commands.parentModule.handle);
-  vscode.commands.registerCommand('rust-analyzer.run', commands.runnables.handle);
+  // vscode.commands.registerCommand('rust-analyzer.run', commands.runnables.handle);
   // Unlike the above this does not send requests to the language server
-  vscode.commands.registerCommand('rust-analyzer.runSingle', commands.runnables.handleSingle);
+  // vscode.commands.registerCommand('rust-analyzer.runSingle', commands.runnables.handleSingle);
   vscode.commands.registerCommand(
     'rust-analyzer.applySourceChange',
     commands.applySourceChange.handle
@@ -73,7 +73,7 @@ export async function activate(context: vscode.ExtensionContext) {
         }
       });
     } catch (_) {
-      console.error("overrideCommand does not work")
+      console.error('overrideCommand does not work')
     }
   }
 
@@ -95,7 +95,7 @@ export async function activate(context: vscode.ExtensionContext) {
   //   events.changeActiveTextEditor.handle
   // );
 
-  const textDocumentContentProvider = new TextDocumentContentProvider();
+  // const textDocumentContentProvider = new TextDocumentContentProvider();
   // TODO for when Coc gets dispose support
   // disposeOnDeactivation(
   //   vscode.workspace.registerTextDocumentContentProvider(
@@ -104,11 +104,11 @@ export async function activate(context: vscode.ExtensionContext) {
   //   )
   // );
 
-  vscode.workspace.onDidChangeTextDocument(
-    events.changeTextDocument.createHandler(textDocumentContentProvider),
-    null,
-    context.subscriptions
-  );
+  // vscode.workspace.onDidChangeTextDocument(
+  //   events.changeTextDocument.createHandler(textDocumentContentProvider),
+  //   null,
+  //   context.subscriptions
+  // );
 
   // Start the language server, finally!
   Server.start(allNotifications);
