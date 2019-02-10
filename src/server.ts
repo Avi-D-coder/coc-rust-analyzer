@@ -27,6 +27,7 @@ export class Server {
             }
         };
 
+        console.error('server 30')
         Server.client = new lc.LanguageClient(
             'ra-lsp',
             'rust-analyzer language server',
@@ -67,5 +68,6 @@ export class Server {
             }
         });
         Server.client.start();
+        console.error('server 71')
     }
 }

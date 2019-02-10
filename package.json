@@ -2,6 +2,7 @@
     "name": "ra-lsp",
     "displayName": "ra-lsp",
     "description": "An alternative rust language server to the RLS",
+    "main": "lib/extension.js",
     "preview": true,
     "private": true,
     "version": "0.0.1",
@@ -9,13 +10,14 @@
     "repository": {
         "url": "https://github.com/matklad/rust-analyzer/"
     },
-    "categories": [
-        "Other"
-    ],
+    "categories": ["Other"],
     "engines": {
         "coc": ">=0.0.28"
     },
     "scripts": {
+        "clean": "rimraf lib",
+        "build": "tsc -p tsconfig.json",
+        "prepare": "yarn clean && yarn build",
         "compile": "tsc -p ./",
         "watch": "tsc -watch -p ./",
         "fix": "prettier **/*.{json,ts} --write && tslint --project . --fix",
@@ -32,13 +34,15 @@
         "vscode-uri": "^1.0.6"
     },
     "devDependencies": {
+        "@chemzqm/tsconfig": "^0.0.3",
         "@types/mocha": "^2.2.42",
         "@types/node": "^8.10.39",
         "prettier": "^1.15.3",
         "tslint": "^5.12.1",
         "tslint-config-prettier": "^1.17.0",
         "typescript": "^2.6.1",
-        "coc.nvim": "^0.0.32"
+        "coc.nvim": "^0.0.32",
+        "rimraf": "^2.6.2"
     },
     "activationEvents": [
         "onLanguage:rust",
@@ -49,9 +53,7 @@
         "taskDefinitions": [
             {
                 "type": "cargo",
-                "required": [
-                    "command"
-                ],
+                "required": ["command"],
                 "properties": {
                     "label": {
                         "type": "string"
@@ -147,20 +149,14 @@
                     "description": "Highlight Rust code (overrides built-in syntax highlighting)"
                 },
                 "rust-analyzer.raLspServerPath": {
-                    "type": [
-                        "string"
-                    ],
+                    "type": ["string"],
                     "default": "ra_lsp_server",
                     "description": "Path to ra_lsp_server executable"
                 },
                 "rust-analyzer.trace.server": {
                     "type": "string",
                     "scope": "window",
-                    "enum": [
-                        "off",
-                        "messages",
-                        "verbose"
-                    ],
+                    "enum": ["off", "messages", "verbose"],
                     "default": "off",
                     "description": "Trace requests to the ra_lsp_server"
                 }
@@ -189,10 +185,7 @@
         "problemMatchers": [
             {
                 "name": "rustc",
-                "fileLocation": [
-                    "relative",
-                    "${workspaceRoot}"
-                ],
+                "fileLocation": ["relative", "${workspaceRoot}"],
                 "pattern": [
                     {
                         "regexp": "^(warning|warn|error)(?:\\[(.*?)\\])?: (.*)$",
@@ -210,10 +203,7 @@
             },
             {
                 "name": "rustc-watch",
-                "fileLocation": [
-                    "relative",
-                    "${workspaceRoot}"
-                ],
+                "fileLocation": ["relative", "${workspaceRoot}"],
                 "background": {
                     "beginsPattern": "^\\[Running ",
                     "endsPattern": "^(\\[Finished running\\]|To learn more, run the command again with --verbose\\.)$"

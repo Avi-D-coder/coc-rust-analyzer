@@ -1,12 +1,15 @@
 {
+  "extends": "./node_modules/@chemzqm/tsconfig/tsconfig.json",
     "compilerOptions": {
         "module": "commonjs",
         "target": "es6",
-        "outDir": "out",
-        "lib": ["es6"],
+        "outDir": "lib",
+        "moduleResolution": "node",
+        "importHelpers": true,
+        "lib": ["es2018"],
         "sourceMap": true,
         "rootDir": "src",
         "strict": true
     },
-    "exclude": ["node_modules", ".vscode-test"]
+    "exclude": []
 }
