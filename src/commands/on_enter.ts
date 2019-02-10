@@ -16,9 +16,7 @@ export async function handle(event: { text: string }): Promise<boolean> {
     }
     const request: lc.TextDocumentPositionParams = {
         textDocument: { uri: document.uri.toString() },
-        position: Server.client.code2ProtocolConverter.asPosition(
-            vscode.workspace.getOffset()
-        )
+        position: await vscode.workspace.getCursorPosition()
     };
     const change = await Server.client.sendRequest<undefined | SourceChange>(
         'rust-analyzer/onEnter',

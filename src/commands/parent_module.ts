@@ -10,8 +10,7 @@ export async function handle() {
     }
     const request: lc.TextDocumentPositionParams = {
         textDocument: { uri: document.uri.toString() },
-        position: Server.client.code2ProtocolConverter.asPosition(
-            await vscode.workspace.getOffset())
+        position: await vscode.workspace.getCursorPosition()
     };
     const response = await Server.client.sendRequest<lc.Location[]>(
         'rust-analyzer/parentModule',

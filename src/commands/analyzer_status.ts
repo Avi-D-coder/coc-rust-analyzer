@@ -16,7 +16,7 @@ export class TextDocumentContentProvider
         return Server.client.sendRequest<string>(
             'rust-analyzer/analyzerStatus',
             null
-        );
+        ) as vscode.ProviderResult<string>;
     }
 
     get onDidChange(): Event<Uri> {

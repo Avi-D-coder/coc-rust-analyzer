@@ -1,4 +1,5 @@
-import * as lc from 'vscode-languageclient';
+import * as lc from 'coc.nvim';
+import {GenericNotificationHandler} from 'vscode-languageserver-protocol';
 
 import { Config } from './config';
 // import { Highlighter } from './highlighting';
@@ -9,7 +10,7 @@ export class Server {
     public static client: lc.LanguageClient;
 
     public static start(
-        notificationHandlers: Iterable<[string, lc.GenericNotificationHandler]>
+        notificationHandlers: Iterable<[string, GenericNotificationHandler]>
     ) {
         const run: lc.Executable = {
             command: this.config.raLspServerPath,

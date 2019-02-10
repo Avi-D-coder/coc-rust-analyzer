@@ -6,7 +6,7 @@ import {
     handle as applySourceChange,
     SourceChange
 } from './apply_source_change';
-import {getSelectedRange} from './selection_helpers';
+import { getSelectedRange } from './selection_helpers';
 
 interface JoinLinesParams {
     textDocument: TextDocumentIdentifier;
@@ -19,7 +19,7 @@ export async function handle() {
         return;
     }
     const request: JoinLinesParams = {
-        range: Server.client.code2ProtocolConverter.asRange(getSelectedRange()),
+        range: await getSelectedRange(),
         textDocument: { uri: document.uri.toString() }
     };
     const change = await Server.client.sendRequest<SourceChange>(

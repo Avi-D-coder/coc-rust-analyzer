@@ -2,11 +2,17 @@ import * as vscode from 'coc.nvim';
 import { Range } from 'vscode-languageserver-types';
 
 // modified from coc.nvim/src/handler/index.ts
-export async function getSelectedRange(): Promise<Range | undefined> {
+export async function getSelectedRange(): Promise<Range> {
+    const fallback = async () => {
+        const pos = await vscode.workspace.getCursorPosition();
+        return {
+            start: pos,
+            end: pos,
+        }
+    };
     const mode = (await vscode.workspace.nvim.mode).mode;
     if (['v', 'V', 'char', 'line'].indexOf(mode) === -1) {
-        vscode.workspace.showMessage(`Mode '${mode}' is not supported`, 'error')
-        return
+        return fallback()
     }
     const { nvim } = vscode.workspace
     const isVisual = ['v', 'V'].indexOf(mode) !== -1
@@ -16,11 +22,10 @@ export async function getSelectedRange(): Promise<Range | undefined> {
     c = isVisual ? '>' : ']'
     await nvim.command('normal! `' + c)
     const end = await vscode.workspace.getOffset() + 1
-    if (start == null || end == null || start === end) {
-        vscode.workspace.showMessage(`Failed to get selected range`, 'error')
-        return
-    }
     const document = (await vscode.workspace.document).textDocument;
+    if (start == null || end == null || start === end) {
+        return fallback()
+    }
     return {
         start: document.positionAt(start),
         end: document.positionAt(end)

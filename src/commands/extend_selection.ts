@@ -2,7 +2,7 @@ import * as vscode from 'coc.nvim';
 
 import { Range, TextDocumentIdentifier } from 'vscode-languageserver-types';
 import { Server } from '../server';
-import {getSelectedRange, setSelectedRange} from './selection_helpers'
+import { getSelectedRange, setSelectedRange } from './selection_helpers'
 
 interface ExtendSelectionParams {
     textDocument: TextDocumentIdentifier;
@@ -15,7 +15,7 @@ interface ExtendSelectionResult {
 
 export async function handle() {
     const document = await vscode.workspace.document;
-    const selection = await getSelectedRange() as Range;
+    const selection = await getSelectedRange();
     if (document.filetype !== 'rust' && selection !== undefined) {
         return;
     }

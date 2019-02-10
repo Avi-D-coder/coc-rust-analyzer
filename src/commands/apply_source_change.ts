@@ -1,10 +1,7 @@
 import * as vscode from 'coc.nvim';
-import { TextDocumentPositionParams} from 'vscode-languageserver-protocol';
+import { TextDocumentPositionParams } from 'vscode-languageserver-protocol';
 import * as lc from 'vscode-languageserver-types';
 import Uri from 'vscode-uri'
-
-import { Server } from '../server';
-import {getSelectedRange} from './selection_helpers'
 
 export interface SourceChange {
     label: string;
@@ -13,9 +10,7 @@ export interface SourceChange {
 }
 
 export async function handle(change: SourceChange) {
-    const wsEdit = Server.client.protocol2CodeConverter.asWorkspaceEdit(
-        change.workspaceEdit
-    );
+    const wsEdit = change.workspaceEdit
     let created;
     let moved;
     if (change.workspaceEdit.documentChanges) {
@@ -34,20 +29,12 @@ export async function handle(change: SourceChange) {
         const toOpenUri = Uri.parse(toOpen);
         await vscode.workspace.readFile(toOpenUri.fsPath);
     } else if (toReveal) {
-        const uri = Server.client.protocol2CodeConverter.asUri(
-            toReveal.textDocument.uri
-        );
-        const position = Server.client.protocol2CodeConverter.asPosition(
-            toReveal.position
-        );
+        const uri = toReveal.textDocument.uri
+        const position = toReveal.position
         const document = await vscode.workspace.document;
         if (!vscode.workspace || document.uri.toString() !== uri.toString()) {
             return;
         }
-        const selection = await getSelectedRange()
-        if (selection !== undefined) {
-            return;
-        }
-        vscode.workspace.nvim.command(`call setpos('.', [${document.bufnr}, ${position.line}, ${position.cursor}, 0])`)
+        vscode.workspace.nvim.command(`call setpos('.', [${document.bufnr}, ${position.line + 1}, ${position.character + 1}, 0])`)
     }
 }
