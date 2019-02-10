@@ -1,7 +1,8 @@
-import * as vscode from 'vscode';
+import * as vscode from 'coc.nvim';
 
-import { Range, TextDocumentIdentifier } from 'vscode-languageclient';
+import { Range, TextDocumentIdentifier } from 'vscode-languageserver-types';
 import { Server } from '../server';
+import {getSelectedRange, setSelectedRange} from './selection_helpers'
 
 interface ExtendSelectionParams {
     textDocument: TextDocumentIdentifier;
@@ -13,22 +14,19 @@ interface ExtendSelectionResult {
 }
 
 export async function handle() {
-    const editor = vscode.window.activeTextEditor;
-    if (editor == null || editor.document.languageId !== 'rust') {
+    const document = await vscode.workspace.document;
+    const selection = await getSelectedRange() as Range;
+    if (document.filetype !== 'rust' && selection !== undefined) {
         return;
     }
     const request: ExtendSelectionParams = {
-        selections: editor.selections.map(s =>
-            Server.client.code2ProtocolConverter.asRange(s)
-        ),
-        textDocument: { uri: editor.document.uri.toString() }
+        // TODO handle multiple selections
+        selections: [selection],
+        textDocument: { uri: document.uri }
     };
     const response = await Server.client.sendRequest<ExtendSelectionResult>(
         'rust-analyzer/extendSelection',
         request
     );
-    editor.selections = response.selections.map((range: Range) => {
-        const r = Server.client.protocol2CodeConverter.asRange(range);
-        return new vscode.Selection(r.start, r.end);
-    });
+    await setSelectedRange(response.selections[0])
 }

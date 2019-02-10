@@ -1,7 +1,8 @@
-import * as vscode from 'vscode';
+import * as vscode from 'coc.nvim';
 
-import { Position, TextDocumentIdentifier } from 'vscode-languageclient';
+import { Position, TextDocumentIdentifier } from 'vscode-languageserver-protocol';
 import { Server } from '../server';
+import { getSelectedRange, setSelectedRange } from './selection_helpers';
 
 interface FindMatchingBraceParams {
     textDocument: TextDocumentIdentifier;
@@ -9,26 +10,29 @@ interface FindMatchingBraceParams {
 }
 
 export async function handle() {
-    const editor = vscode.window.activeTextEditor;
-    if (editor == null || editor.document.languageId !== 'rust') {
+    const document = await vscode.workspace.document;
+    if (document.filetype !== 'rust') {
         return;
     }
     const request: FindMatchingBraceParams = {
-        textDocument: { uri: editor.document.uri.toString() },
-        offsets: editor.selections.map(s => {
-            return Server.client.code2ProtocolConverter.asPosition(s.active);
-        })
+        textDocument: { uri: document.uri.toString() },
+        offsets:
+            [Server.client.code2ProtocolConverter.asPosition(vscode.workspace.getOffset())]
     };
     const response = await Server.client.sendRequest<Position[]>(
         'rust-analyzer/findMatchingBrace',
         request
     );
-    editor.selections = editor.selections.map((sel, idx) => {
-        const active = Server.client.protocol2CodeConverter.asPosition(
-            response[idx]
-        );
-        const anchor = sel.isEmpty ? active : sel.anchor;
-        return new vscode.Selection(anchor, active);
-    });
-    editor.revealRange(editor.selection);
+
+    const active = Server.client.protocol2CodeConverter.asPosition(
+        response[0]
+    );
+    const selRange = await getSelectedRange();
+    let anchor;
+    if (selRange === undefined) {
+        anchor = active
+    } else {
+        anchor = selRange.start
+    }
+    setSelectedRange({ start: anchor, end: active });
 }

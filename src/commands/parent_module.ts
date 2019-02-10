@@ -1,18 +1,17 @@
-import * as vscode from 'vscode';
+import * as vscode from 'coc.nvim';
 
-import * as lc from 'vscode-languageclient';
+import * as lc from 'vscode-languageserver-protocol';
 import { Server } from '../server';
 
 export async function handle() {
-    const editor = vscode.window.activeTextEditor;
-    if (editor == null || editor.document.languageId !== 'rust') {
+    const document = await vscode.workspace.document;
+    if (document.filetype !== 'rust') {
         return;
     }
     const request: lc.TextDocumentPositionParams = {
-        textDocument: { uri: editor.document.uri.toString() },
+        textDocument: { uri: document.uri.toString() },
         position: Server.client.code2ProtocolConverter.asPosition(
-            editor.selection.active
-        )
+            await vscode.workspace.getOffset())
     };
     const response = await Server.client.sendRequest<lc.Location[]>(
         'rust-analyzer/parentModule',
@@ -22,11 +21,7 @@ export async function handle() {
     if (loc == null) {
         return;
     }
-    const uri = Server.client.protocol2CodeConverter.asUri(loc.uri);
-    const range = Server.client.protocol2CodeConverter.asRange(loc.range);
 
-    const doc = await vscode.workspace.openTextDocument(uri);
-    const e = await vscode.window.showTextDocument(doc);
-    e.selection = new vscode.Selection(range.start, range.start);
-    e.revealRange(range, vscode.TextEditorRevealType.InCenter);
+    await vscode.workspace.openResource(loc.uri)
+    await vscode.workspace.nvim.call('setpos', ['.', loc.range.start.line, loc.range.start.character])
 }

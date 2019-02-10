@@ -1,11 +1,12 @@
-import * as vscode from 'vscode';
+import * as vscode from 'coc.nvim';
 
-import { Range, TextDocumentIdentifier } from 'vscode-languageclient';
+import { Range, TextDocumentIdentifier } from 'vscode-languageserver-protocol';
 import { Server } from '../server';
 import {
     handle as applySourceChange,
     SourceChange
 } from './apply_source_change';
+import {getSelectedRange} from './selection_helpers';
 
 interface JoinLinesParams {
     textDocument: TextDocumentIdentifier;
@@ -13,13 +14,13 @@ interface JoinLinesParams {
 }
 
 export async function handle() {
-    const editor = vscode.window.activeTextEditor;
-    if (editor == null || editor.document.languageId !== 'rust') {
+    const document = await vscode.workspace.document;
+    if (document.filetype !== 'rust') {
         return;
     }
     const request: JoinLinesParams = {
-        range: Server.client.code2ProtocolConverter.asRange(editor.selection),
-        textDocument: { uri: editor.document.uri.toString() }
+        range: Server.client.code2ProtocolConverter.asRange(getSelectedRange()),
+        textDocument: { uri: document.uri.toString() }
     };
     const change = await Server.client.sendRequest<SourceChange>(
         'rust-analyzer/joinLines',
