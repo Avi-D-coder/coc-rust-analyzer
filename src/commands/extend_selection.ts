@@ -16,7 +16,7 @@ interface ExtendSelectionResult {
 export async function handle() {
     const document = await vscode.workspace.document;
     const selection = await getSelectedRange();
-    if (document.filetype !== 'rust' && selection !== undefined) {
+    if (document.filetype !== 'rust') {
         return;
     }
     const request: ExtendSelectionParams = {

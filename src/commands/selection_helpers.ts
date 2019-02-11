@@ -7,35 +7,34 @@ export async function getSelectedRange(): Promise<Range> {
         const pos = await vscode.workspace.getCursorPosition();
         return {
             start: pos,
-            end: pos,
+            end: { line: pos.line, character: pos.character },
         }
     };
-    const mode = (await vscode.workspace.nvim.mode).mode;
+    const { nvim } = vscode.workspace
+    const modeBroken = (await vscode.workspace.nvim.mode).mode;
+    const mode: string = await nvim.call('mode', [])
+    vscode.workspace.echoLines([mode, modeBroken])
     if (['v', 'V', 'char', 'line'].indexOf(mode) === -1) {
         return fallback()
     }
-    const { nvim } = vscode.workspace
     const isVisual = ['v', 'V'].indexOf(mode) !== -1
-    let c = isVisual ? '<' : '['
-    await nvim.command('normal! `' + c)
-    const start = await vscode.workspace.getOffset()
-    c = isVisual ? '>' : ']'
-    await nvim.command('normal! `' + c)
-    const end = await vscode.workspace.getOffset() + 1
-    const document = (await vscode.workspace.document).textDocument;
-    if (start == null || end == null || start === end) {
+    const sm = isVisual ? '<' : '['
+    const em = isVisual ? '>' : ']'
+    const start: number[] = await nvim.call('getpos', `'${sm}`);
+    const end: number[] = await nvim.call('getpos', `'${em}`);
+    if (!start || !end || start === end) {
         return fallback()
     }
+    // TODO handle astral characters
     return {
-        start: document.positionAt(start),
-        end: document.positionAt(end)
+        start: { line: start[1] - 1, character: start[2] - 1 },
+        end: { line: end[1] - 1, character: end[2] - 1 }
     }
 }
 
 export async function setSelectedRange(range: Range) {
-    vscode.workspace.nvim.command(`
-        call setpos('.',[0, ${range.start.line + 1}, ${range.start.character + 1}, 0])
-        normal! v
-        call setpos('.',[0, ${range.end.line + 1}, ${range.end.character + 1}, 0])`
-    )
+    const { nvim } = vscode.workspace;
+    await nvim.call('setpos', [`'<`, [0, range.start.line + 1, range.start.character + 1]])
+    await nvim.call('setpos', [`'>`, [0, range.end.line + 1, range.end.character + 1]])
+    nvim.command('normal! gv')
 }
